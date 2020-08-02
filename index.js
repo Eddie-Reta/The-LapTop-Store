@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
     
     const id = url.parse(req.url, true).query.id;
     
-
+    //PRODUCT OVERVIEW
    if (pathName === "/products" || pathName === "/") {
 
       //Headers are small messages sent with the request to let it Know what kind of data is being passed.
@@ -39,16 +39,35 @@ const server = http.createServer((req, res) => {
 
     res.writeHead(200, { "Content-Type" : "text/html"});
     
-   } 
+    fs.readFile(`${__dirname}/templates/template-overview.html`, "utf-8", (err, data) => {
+            let overviewOutput = data
+        //we only want to read the card template one the overview tamplate has been read  basically to created a sequence "LOOP". 
+
+        fs.readFile(`${__dirname}/templates/template-card.html`, "utf-8", (err, data) => {
+            
+           const cardsOutput = laptopData.map(el => replaceTemplate(data, el)).join("")
+        //  console.log(cardsOutput)
+            overviewOutput = overviewOutput.replace("{%CARDS%}", cardsOutput);
+
+           res.end(overviewOutput);
+        });
+    });
+
+   }
+
+   //LAPTOP DETAIL
    else if (pathName === "/laptop" && id < laptopData.length) {
     
     res.writeHead(200, { "Content-Type" : "text/html"});
     
     fs.readFile(`${__dirname}/templates/template-laptop.html`, "utf-8", (err, data) => {
         const laptop = laptopData[id];
+        const output = replaceTemplate(data, laptop);
         res.end(output)
     });
    }
+
+   //URL NOT FOUND
    else {
     res.writeHead(404, { "Content-Type" : "text/html"});
     
@@ -72,8 +91,9 @@ function replaceTemplate(originalHtml, laptop) {
          output = output.replace(/{%STORAGE%}/g, laptop.storage);
          output = output.replace(/{%RAM%}/g, laptop.ram);
          output = output.replace(/{%DESCRIPTION%}/g, laptop.description); 
+         output = output.replace(/{%ID%}/g, laptop.id);
          return output;
-}
+};
 
 
 
