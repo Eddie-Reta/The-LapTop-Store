@@ -30,6 +30,7 @@ const server = http.createServer((req, res) => {
     
     const id = url.parse(req.url, true).query.id;
     
+
     //PRODUCT OVERVIEW
    if (pathName === "/products" || pathName === "/") {
 
@@ -66,7 +67,15 @@ const server = http.createServer((req, res) => {
         res.end(output)
     });
    }
+   //Images
 
+   //irregular expression to find image extension 
+   else if ((/\.(jpg|jpeg|png|gif)$/i).test(pathName)){
+       fs.readFile(`${__dirname}/data/img${pathName}`, (err, data) => {
+        res.writeHead(200, { "Content-Type" : "image/jpg"});
+        res.end(data);
+       })
+   }
    //URL NOT FOUND
    else {
     res.writeHead(404, { "Content-Type" : "text/html"});
